@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Penilaian Guru SD">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <title>Aplikasi Penilaian Guru SD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Memuat aplikasi...</p>
+    </div>
+
+    <!-- Pull to Refresh Indicator -->
+    <div class="pull-refresh-indicator">
+        <i class="fas fa-sync-alt"></i> Tarik untuk memperbarui
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <div class="login-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h1>Aplikasi Penilaian Guru SD</h1>
+                <p>Sistem Penilaian yang Mudah dan Praktis</p>
+            </div>
+
+            <div class="login-tabs">
+                <button class="tab-btn active" onclick="showLoginForm()">
+                    <i class="fas fa-sign-in-alt"></i> Masuk
+                </button>
+                <button class="tab-btn" onclick="showRegisterForm()">
+                    <i class="fas fa-user-plus"></i> Daftar
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <form onsubmit="handleLogin(event)" autocomplete="off">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" 
+                               id="loginUsername" 
+                               autocomplete="username" 
+                               required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" 
+                               id="loginPassword" 
+                               autocomplete="current-password"
+                               required>
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Masuk
+                    </button>
+                </form>
+                
+                <!-- Admin Delete All Accounts -->
+                <div class="admin-section">
+                    <button type="button" class="btn-link danger" onclick="showDeleteAllAccountsModal()">
+                        <i class="fas fa-trash-alt"></i> Hapus Semua Data Akun
+                    </button>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form">
+                <form onsubmit="handleRegister(event)" autocomplete="off">
+                    <div class="form-group">
+                        <label for="registerName">Nama Lengkap</label>
+                        <input type="text" 
+                               id="registerName" 
+                               autocomplete="name" 
+                               required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" 
+                               id="registerUsername" 
+                               autocomplete="username" 
+                               required>
+                        <i class="fas fa-user-tag"></i>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" 
+                               id="registerPassword" 
+                               autocomplete="new-password"
+                               minlength="8"
+                               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$"
+                               title="Password harus minimal 8 karakter dengan kombinasi huruf besar, huruf kecil, dan angka"
+                               oninput="showPasswordStrength(this.value, 'passwordStrength')"
+                               required>
+                        <i class="fas fa-lock"></i>
+                        <div id="passwordStrength" class="password-strength-container"></div>
+                        <small class="form-help">
+                            Password harus minimal 8 karakter: huruf besar, huruf kecil, dan angka
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerClass">Pilih Kelas</label>
+                        <select id="registerClass" required>
+                            <option value="">Pilih Kelas</option>
+                        </select>
+                        <i class="fas fa-chalkboard"></i>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Daftar
+                    </button>
+                </form>
+            </div>
+
+            <div class="login-footer">
+                <p>&copy; 2025 Aplikasi Penilaian Guru SD</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="page">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <button id="menuToggle" class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="nav-brand">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Penilaian Guru SD</span>
+                </div>
+            </div>
+            <div class="nav-user">
+                <span id="userName">Loading...</span>
+                <button onclick="confirmDeleteAccount()" class="btn btn-danger-outline" title="Hapus Akun">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <button onclick="logout()" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar Overlay -->
+            <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+            
+            <!-- Sidebar -->
+            <aside id="sidebar" class="sidebar sidebar-hidden">
+                <div class="sidebar-header">
+                    <h3 id="className">Kelas</h3>
+                    <button class="sidebar-close" onclick="closeSidebar()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="#" onclick="showWelcome()" class="menu-item active">
+                            <i class="fas fa-home"></i>
+                            <span>Beranda</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showDashboard()" class="menu-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showStudents()" class="menu-item">
+                            <i class="fas fa-users"></i>
+                            <span>Data Siswa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showSubjects()" class="menu-item">
+                            <i class="fas fa-book"></i>
+                            <span>Mata Pelajaran</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showTasks()" class="menu-item">
+                            <i class="fas fa-tasks"></i>
+                            <span>Tugas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showGrades()" class="menu-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Penilaian</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showReports()" class="menu-item">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content">
+                <!-- Welcome Content -->
+                <div id="welcomeContent" class="content-section active">
+                    <!-- Welcome Section -->
+                    <div class="welcome-section">
+                        <div class="welcome-header">
+                            <div class="school-logo">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="welcome-text">
+                                <h1>SELAMAT DATANG DI SISTEM PENILAIAN SISWA</h1>
+                                <h2>UPT SD NEGERI 117 INPRES BONTOMANGAPE</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="school-description">
+                            <div class="description-card">
+                                <div class="description-icon">
+                                    <i class="fas fa-school"></i>
+                                </div>
+                                <div class="description-content">
+                                    <h3>Tentang Sekolah Kami</h3>
+                                    <p>UPT SD Negeri 117 Inpres Bontomangape adalah sebuah sekolah dasar yang berlokasi di daerah Bontomangape. Sekolah ini didirikan sebagai bagian dari program Instruksi Presiden (Inpres) untuk meningkatkan akses pendidikan dasar bagi masyarakat Indonesia.</p>
+                                    
+                                    <p>Dengan komitmen untuk memberikan pendidikan berkualitas, sekolah ini menyediakan lingkungan belajar yang kondusif dan mendukung perkembangan akademik serta karakter siswa-siswa. Kami berkomitmen untuk mencerdaskan generasi penerus bangsa melalui pendidikan yang bermutu dan berlandaskan nilai-nilai Pancasila.</p>
+                                    
+                                    <div class="school-features">
+                                        <div class="feature-item">
+                                            <i class="fas fa-users"></i>
+                                            <span>Tenaga Pendidik Berkualitas</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-book-open"></i>
+                                            <span>Kurikulum Merdeka</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-heart"></i>
+                                            <span>Pendidikan Karakter</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-trophy"></i>
+                                            <span>Prestasi Akademik</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-handshake"></i>
+                                            <span>Kerjasama Orang Tua</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-laptop"></i>
+                                            <span>Teknologi Pembelajaran</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content -->
+                <div id="dashboardContent" class="content-section">
+                    <!-- Statistics Section -->
+                    <div class="page-header">
+                        <h2><i class="fas fa-chart-bar"></i> Dashboard Statistik</h2>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalStudents">0</h3>
+                                <p>Total Siswa</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalSubjects">0</h3>
+                                <p>Mata Pelajaran</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalTasks">0</h3>
+                                <p>Total Tugas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalGrades">0</h3>
+                                <p>Total Nilai</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="welcome-card">
+                        <h3>Selamat Datang!</h3>
+                        <p>Aplikasi ini membantu Anda mengelola penilaian siswa dengan mudah dan praktis. Gunakan menu di samping untuk mulai mengelola data siswa dan nilai.</p>
+                        <div class="quick-actions">
+                            <button onclick="showStudents()" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Tambah Siswa
+                            </button>
+                            <button onclick="showTasks()" class="btn btn-success">
+                                <i class="fas fa-tasks"></i> Buat Tugas
+                            </button>
+                            <button onclick="showGrades()" class="btn btn-info">
+                                <i class="fas fa-edit"></i> Input Nilai
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Content -->
+                <div id="studentsContent" class="content-section">
+                    <div class="page-header">
+                        <h2><i class="fas fa-users"></i> Data Siswa</h2>
+                        <button onclick="showAddStudentModal()" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Tambah Siswa
+                        </button>
+                    </div>
+
+                    <!-- Compact Students List -->
+                    <div class="students-list" id="studentsList">
+                        <!-- Students data will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Subjects Content -->
+                <div id="subjectsContent" class="content-section">
+                    <div class="page-header">
+                        <h2><i class="fas fa-book"></i> Mata Pelajaran</h2>
+                        <button onclick="cleanupDuplicateSubjects()" class="btn btn-warning">
+                            <i class="fas fa-broom"></i> Bersihkan Duplikasi
+                        </button>
+                    </div>
+
+                    <div class="subjects-grid">
+                        <div class="subject-card seni-config">
+                            <div class="subject-header">
+                                <h3><i class="fas fa-palette"></i> Konfigurasi Mata Pelajaran Seni</h3>
+                            </div>
+                            <div class="subject-body">
+                                <p>Pilih jenis mata pelajaran seni untuk kelas Anda:</p>
+                                <div class="seni-options">
+                                    <div class="form-group">
+                                        <label for="seniType">Jenis Seni</label>
+                                        <select id="seniType">
+                                            <option value="">Pilih Jenis Seni</option>
+                                            <option value="seni_rupa">Seni Rupa</option>
+                                            <option value="seni_teater">Seni Teater</option>
+                                            <option value="seni_musik">Seni Musik</option>
+                                            <option value="seni_tari">Seni Tari</option>
+                                        </select>
+                                    </div>
+                                    <button onclick="updateSeniSubject()" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Simpan Konfigurasi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <h3>Daftar Mata Pelajaran</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Mata Pelajaran</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectsTableBody">
+                                <!-- Subjects data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tasks Content -->
+                <div id="tasksContent" class="content-section">
+                    <div class="page-header">
+                        <h2><i class="fas fa-tasks"></i> Manajemen Tugas</h2>
+                        <button onclick="showAddTaskModal()" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Buat Tugas Baru
+                        </button>
+                    </div>
+
+                    <div class="filter-section compact">
+                        <div class="filter-group inline">
+                            <select id="taskSubjectFilter" onchange="filterTasks()">
+                                <option value="">Semua Mata Pelajaran</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Compact Tasks Grid -->
+                    <div class="tasks-grid" id="tasksGrid">
+                        <!-- Tasks will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Grades Content -->
+                <div id="gradesContent" class="content-section">
+                    <div class="page-header">
+                        <div class="header-title">
+                            <h2><i class="fas fa-chart-line"></i> Penilaian</h2>
+                        </div>
+                        <div class="filter-section">
+                            <div class="filter-group">
+                                <select id="gradeTypeFilter" onchange="loadGrades()">
+                                    <option value="">Semua Jenis Nilai</option>
+                                    <option value="task">Nilai Tugas</option>
+                                    <option value="final">Nilai Akhir</option>
+                                </select>
+                                <select id="subjectFilter" onchange="loadGrades()">
+                                    <option value="">Semua Mata Pelajaran</option>
+                                </select>
+                                <select id="semesterFilter" onchange="loadGrades()">
+                                    <option value="">Semua Semester</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                </select>
+                                <select id="academicYearFilter" onchange="loadGrades()">
+                                    <option value="">Semua Tahun</option>
+                                    <!-- Options will be populated dynamically by JavaScript -->
+                                </select>
+                                <button onclick="loadGrades()" class="btn btn-filter">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <button onclick="clearFilters()" class="btn btn-clear">
+                                    <i class="fas fa-times"></i> Bersihkan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Penilaian Section -->
+                    <div class="grades-display-section">
+                        <div class="grades-table-container">
+                            <div class="table-header">
+                                <h3><i class="fas fa-table"></i> Data Penilaian</h3>
+                                <div class="table-actions">
+                                    <button onclick="exportGradesToExcel()" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i> Export Excel
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table id="gradesTable" class="grades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Siswa</th>
+                                            <th>Mata Pelajaran</th>
+                                            <th>Jenis Nilai</th>
+                                            <th>Tugas/Ujian</th>
+                                            <th>Nilai</th>
+                                            <th>Semester</th>
+                                            <th>Tahun Akademik</th>
+                                            <th>Tanggal Input</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gradesTableBody">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="noGradesMessage" class="no-data-message" style="display: none;">
+                                <i class="fas fa-chart-line"></i>
+                                <h4>Belum Ada Data Penilaian</h4>
+                                <p>Gunakan filter di atas untuk mencari data atau mulai input nilai baru di bawah</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grade-input-section">
+                        <h3>Input Nilai Baru</h3>
+                        
+                        <div class="grade-tabs">
+                            <button class="grade-tab-btn active" onclick="showGradeTab('task')">
+                                <i class="fas fa-tasks"></i> Nilai Tugas
+                            </button>
+                            <button class="grade-tab-btn" onclick="showGradeTab('final')">
+                                <i class="fas fa-award"></i> Nilai Akhir
+                            </button>
+                        </div>
+                        
+                        <!-- Task Grade Form -->
+                        <div id="taskGradeForm" class="grade-form-tab active">
+                            <!-- Criteria Selection Form -->
+                            <div id="gradeCriteriaForm" class="grade-criteria-form">
+                                <h4><i class="fas fa-filter"></i> Pilih Kriteria Penilaian</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="bulkGradeSubject">Mata Pelajaran</label>
+                                        <select id="bulkGradeSubject" required onchange="loadTasksForBulkGrading()">
+                                            <option value="">Pilih Mata Pelajaran</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bulkGradeTask">Tugas</label>
+                                        <select id="bulkGradeTask" required>
+                                            <option value="">Pilih Tugas</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bulkGradeSemester">Semester</label>
+                                        <select id="bulkGradeSemester" required>
+                                            <option value="">Pilih Semester</option>
+                                            <option value="1">Semester 1</option>
+                                            <option value="2">Semester 2</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bulkGradeAcademicYear">Tahun Akademik</label>
+                                        <select id="bulkGradeAcademicYear" required>
+                                            <option value="">Pilih Tahun</option>
+                                            <!-- Options will be populated dynamically by JavaScript -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" onclick="loadStudentsForBulkGrading()" class="btn btn-primary">
+                                        <i class="fas fa-users"></i> Tampilkan Semua Siswa
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Bulk Students Grading Form -->
+                            <div id="bulkStudentsGradingForm" class="bulk-grading-form" style="display: none;">
+                                <div class="grading-header">
+                                    <h4><i class="fas fa-clipboard-list"></i> Penilaian untuk Semua Siswa</h4>
+                                    <div id="gradingTaskInfo" class="task-info"></div>
+                                </div>
+                                
+                                <form onsubmit="handleBulkTaskGrade(event)">
+                                    <div id="studentsGradingList" class="students-grading-list">
+                                        <!-- Students list will be populated here -->
+                                    </div>
+                                    
+                                    <div class="bulk-actions">
+                                        <button type="button" onclick="loadExistingGrades()" class="btn btn-info">
+                                            <i class="fas fa-download"></i> Muat Nilai Tersimpan
+                                        </button>
+                                        <button type="button" onclick="fillAllGrades()" class="btn btn-secondary">
+                                            <i class="fas fa-fill"></i> Isi Semua dengan Nilai yang Sama
+                                        </button>
+                                        <button type="button" onclick="clearAllGrades()" class="btn btn-outline">
+                                            <i class="fas fa-eraser"></i> Kosongkan Semua
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Simpan Semua Nilai
+                                        </button>
+                                        <button type="button" onclick="cancelBulkGrading()" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Batal
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Final Grade Form -->
+                        <div id="finalGradeForm" class="grade-form-tab">
+                            <!-- Criteria Selection Form for Final Grades -->
+                            <div id="finalGradeCriteriaForm" class="grade-criteria-form">
+                                <h4><i class="fas fa-filter"></i> Pilih Kriteria Penilaian</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="bulkFinalGradeSubject">Mata Pelajaran</label>
+                                        <select id="bulkFinalGradeSubject" required>
+                                            <option value="">Pilih Mata Pelajaran</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bulkFinalGradeSemester">Semester</label>
+                                        <select id="bulkFinalGradeSemester" required>
+                                            <option value="">Pilih Semester</option>
+                                            <option value="1">Semester 1</option>
+                                            <option value="2">Semester 2</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bulkFinalGradeAcademicYear">Tahun Akademik</label>
+                                        <select id="bulkFinalGradeAcademicYear" required>
+                                            <option value="">Pilih Tahun</option>
+                                            <!-- Options will be populated dynamically by JavaScript -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" onclick="loadStudentsForBulkFinalGrading()" class="btn btn-primary">
+                                        <i class="fas fa-users"></i> Tampilkan Semua Siswa
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Bulk Students Final Grading Form -->
+                            <div id="bulkStudentsFinalGradingForm" class="bulk-grading-form" style="display: none;">
+                                <div class="grading-header">
+                                    <h4><i class="fas fa-award"></i> Nilai Akhir untuk Semua Siswa</h4>
+                                    <div id="finalGradingInfo" class="task-info"></div>
+                                </div>
+                                
+                                <form onsubmit="handleBulkFinalGrade(event)">
+                                    <div id="studentsFinalGradingList" class="students-grading-list">
+                                        <!-- Students list will be populated here -->
+                                    </div>
+                                    
+                                    <div class="bulk-actions">
+                                        <button type="button" onclick="loadExistingFinalGrades()" class="btn btn-info">
+                                            <i class="fas fa-download"></i> Muat Nilai Tersimpan
+                                        </button>
+                                        <button type="button" onclick="fillAllFinalGrades()" class="btn btn-secondary">
+                                            <i class="fas fa-fill"></i> Isi Semua dengan Nilai yang Sama
+                                        </button>
+                                        <button type="button" onclick="clearAllFinalGrades()" class="btn btn-outline">
+                                            <i class="fas fa-eraser"></i> Kosongkan Semua
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Simpan Semua Nilai
+                                        </button>
+                                        <button type="button" onclick="cancelBulkFinalGrading()" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Batal
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Content -->
+                <div id="reportsContent" class="content-section">
+                    <div class="page-header">
+                        <h2><i class="fas fa-file-excel"></i> Laporan</h2>
+                    </div>
+
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-table"></i>
+                            </div>
+                            <div class="report-info">
+                                <h3>Ekspor Nilai</h3>
+                                <p>Download semua nilai siswa dalam format Excel</p>
+                                <div class="export-options">
+                                    <select id="exportSemester">
+                                        <option value="">Semua Semester</option>
+                                        <option value="1">Semester 1</option>
+                                        <option value="2">Semester 2</option>
+                                    </select>
+                                    <select id="exportYear">
+                                        <option value="">Semua Tahun</option>
+                                        <!-- Options will be populated dynamically by JavaScript -->
+                                    </select>
+                                    <button onclick="exportGrades()" class="btn btn-success">
+                                        <i class="fas fa-download"></i> Download
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="report-info">
+                                <h3>Daftar Siswa</h3>
+                                <p>Download daftar siswa dalam format Excel</p>
+                                <button onclick="exportStudents()" class="btn btn-success">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add/Edit Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="taskModalTitle">Buat Tugas Baru</h3>
+                <button onclick="closeModal('taskModal')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="handleTaskForm(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="taskId">
+                    <div class="form-group">
+                        <label for="taskName">Nama Tugas</label>
+                        <input type="text" id="taskName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskSubject">Mata Pelajaran</label>
+                        <select id="taskSubject" required>
+                            <option value="">Pilih Mata Pelajaran</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Deskripsi Tugas</label>
+                        <textarea id="taskDescription" rows="3" placeholder="Deskripsi tugas (opsional)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDueDate">Tenggat Waktu (Opsional)</label>
+                        <input type="date" id="taskDueDate">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal('taskModal')" class="btn btn-secondary">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Grades Modal -->
+    <div id="taskGradesModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="taskGradesModalTitle">Nilai Tugas</h3>
+                <button onclick="closeModal('taskGradesModal')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="taskGradesContent">
+                    <!-- Task grades content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add/Edit Student Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="studentModalTitle">Tambah Siswa</h3>
+                <button onclick="closeModal('studentModal')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="handleStudentForm(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="studentId">
+                    <div class="form-group">
+                        <label for="studentName">Nama Siswa</label>
+                        <input type="text" id="studentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentNis">NIS (Nomor Induk Siswa)</label>
+                        <input type="number" 
+                               id="studentNis" 
+                               placeholder="Wajib diisi jika nama siswa sama dengan siswa di kelas lain"
+                               pattern="[0-9]*"
+                               inputmode="numeric"
+                               min="0"
+                               step="1">
+                        <small class="form-help">NIS wajib diisi jika nama siswa sudah ada di kelas lain untuk membedakan siswa (hanya angka)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal('studentModal')" class="btn btn-secondary">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div id="deleteAccountModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus Akun</h3>
+                <button onclick="closeModal('deleteAccountModal')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="deleteAccount(event)">
+                <div class="modal-body">
+                    <div class="danger-warning">
+                        <div class="warning-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="warning-content">
+                            <h4>Anda yakin ingin menghapus akun ini?</h4>
+                            <p>Tindakan ini akan menghapus <strong>PERMANEN</strong>:</p>
+                            <ul>
+                                <li>Akun guru Anda</li>
+                                <li>Semua data siswa di kelas Anda</li>
+                                <li>Semua nilai dan tugas</li>
+                                <li>Semua mata pelajaran custom</li>
+                                <li>Data kelas (jika tidak ada guru lain)</li>
+                            </ul>
+                            <p class="final-warning">
+                                <strong>Peringatan:</strong> Data yang dihapus tidak dapat dikembalikan!
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Masukkan password Anda untuk konfirmasi:</label>
+                        <input type="password" id="confirmPassword" name="password" required 
+                               placeholder="Password Anda">
+                    </div>
+                    <div class="confirmation-note">
+                        <p><strong>Catatan:</strong> Setelah password dikonfirmasi, akun akan dihapus secara permanen.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal('deleteAccountModal')" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Hapus Akun Permanen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete All Accounts Modal -->
+    <div id="deleteAllAccountsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Hapus Semua Data Akun</h3>
+                <button class="modal-close" onclick="closeModal('deleteAllAccountsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="deleteAllAccountsForm" onsubmit="handleDeleteAllAccounts(event)">
+                <div class="modal-body">
+                    <!-- Users List Section -->
+                    <div class="users-section">
+                        <h4><i class="fas fa-users"></i> Akun Yang Terdaftar:</h4>
+                        <div class="users-list-container">
+                            <ul id="usersList" class="users-list">
+                                <li>Memuat data...</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="warning-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>PERINGATAN: Tindakan Tidak Dapat Dibatalkan!</h4>
+                        <p>Anda akan menghapus <strong>SEMUA</strong> data yang ada di sistem:</p>
+                        <ul>
+                            <li>Semua akun guru yang terdaftar</li>
+                            <li>Semua data siswa</li>
+                            <li>Semua mata pelajaran custom</li>
+                            <li>Semua tugas dan penilaian</li>
+                            <li>Semua laporan dan data lainnya</li>
+                        </ul>
+                        <p><strong>Data yang dihapus tidak dapat dikembalikan!</strong></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adminPassword">Masukkan Password Admin:</label>
+                        <input type="password" 
+                               id="adminPassword" 
+                               placeholder="Masukkan password admin" 
+                               required>
+                        <small class="form-help">
+                            Password default: admin123 (dapat diubah melalui environment variable)
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal('deleteAllAccountsModal')" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Hapus Semua Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert/Notification -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="notification-icon"></i>
+            <span class="notification-message"></span>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
